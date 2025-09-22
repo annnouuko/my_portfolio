@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+@layer base {
+  
+   @font-face {
+    font-family: 'Handjet';
+    src: url('/fonts/Handjet-VariableFont_ELGR_ELSH_wght.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* Применяем шрифт по умолчанию к html */
+  html {
+    font-family: 'Handjet', sans-serif;
+  }
+}
