@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 
-export default function AFrameScene() {
+export default function AFrameScene3() {
   const [isClient, setIsClient] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const modelRef = useRef(null);
@@ -14,26 +14,31 @@ export default function AFrameScene() {
         if (!window.AFRAME.components['cursor-rotate-xy']) {
           window.AFRAME.registerComponent('cursor-rotate-xy', {
             schema: { rotationFactor: { type: 'number', default: 1 } },
+
             init: function () {
               this.rotation = { x: 0, y: 0 };
               this.isDragging = false;
 
+              // Мышь
               this.onMouseDown = this.onMouseDown.bind(this);
               this.onMouseMove = this.onMouseMove.bind(this);
               this.onMouseUp = this.onMouseUp.bind(this);
 
+              // Сенсорные события
               this.onTouchStart = this.onTouchStart.bind(this);
               this.onTouchMove = this.onTouchMove.bind(this);
               this.onTouchEnd = this.onTouchEnd.bind(this);
 
               if (this.el.sceneEl && this.el.sceneEl.canvas) {
-                this.el.sceneEl.canvas.addEventListener('mousedown', this.onMouseDown);
-                this.el.sceneEl.canvas.addEventListener('touchstart', this.onTouchStart, { passive: false });
-                this.el.sceneEl.canvas.addEventListener('touchmove', this.onTouchMove, { passive: false });
-                this.el.sceneEl.canvas.addEventListener('touchend', this.onTouchEnd);
+                const canvas = this.el.sceneEl.canvas;
+                canvas.addEventListener('mousedown', this.onMouseDown);
+                canvas.addEventListener('touchstart', this.onTouchStart, { passive: false });
+                canvas.addEventListener('touchmove', this.onTouchMove, { passive: false });
+                canvas.addEventListener('touchend', this.onTouchEnd);
               }
               window.addEventListener('mouseup', this.onMouseUp);
             },
+
             onMouseDown: function (event) {
               this.isDragging = true;
               this.lastX = event.clientX;
@@ -42,6 +47,7 @@ export default function AFrameScene() {
               this.rotation = { x: rot.x, y: rot.y };
               window.addEventListener('mousemove', this.onMouseMove);
             },
+
             onMouseMove: function (event) {
               if (!this.isDragging) return;
               const dx = event.clientX - this.lastX;
@@ -56,6 +62,7 @@ export default function AFrameScene() {
                 z: 0,
               });
             },
+
             onMouseUp: function () {
               this.isDragging = false;
               window.removeEventListener('mousemove', this.onMouseMove);
@@ -71,6 +78,7 @@ export default function AFrameScene() {
                 this.rotation = { x: rot.x, y: rot.y };
               }
             },
+
             onTouchMove: function (event) {
               if (!this.isDragging || event.touches.length !== 1) return;
               event.preventDefault();
@@ -86,6 +94,7 @@ export default function AFrameScene() {
                 z: 0,
               });
             },
+
             onTouchEnd: function () {
               this.isDragging = false;
             },
@@ -94,10 +103,11 @@ export default function AFrameScene() {
               window.removeEventListener('mousemove', this.onMouseMove);
               window.removeEventListener('mouseup', this.onMouseUp);
               if (this.el.sceneEl && this.el.sceneEl.canvas) {
-                this.el.sceneEl.canvas.removeEventListener('mousedown', this.onMouseDown);
-                this.el.sceneEl.canvas.removeEventListener('touchstart', this.onTouchStart);
-                this.el.sceneEl.canvas.removeEventListener('touchmove', this.onTouchMove);
-                this.el.sceneEl.canvas.removeEventListener('touchend', this.onTouchEnd);
+                const canvas = this.el.sceneEl.canvas;
+                canvas.removeEventListener('mousedown', this.onMouseDown);
+                canvas.removeEventListener('touchstart', this.onTouchStart);
+                canvas.removeEventListener('touchmove', this.onTouchMove);
+                canvas.removeEventListener('touchend', this.onTouchEnd);
               }
             },
           });

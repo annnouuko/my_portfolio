@@ -22,5 +22,17 @@
     "files": [
       "static/chunks/_app-pages-browser_node_modules_aframe-extras_index_js.js"
     ]
+  },
+  "app\\components\\AFrameScene3.js -> aframe": {
+    "id": "app\\components\\AFrameScene3.js -> aframe",
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_aframe_dist_aframe-master_module_min_js.js"
+    ]
+  },
+  "app\\components\\AFrameScene3.js -> aframe-extras": {
+    "id": "app\\components\\AFrameScene3.js -> aframe-extras",
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_aframe-extras_index_js.js"
+    ]
   }
 }
