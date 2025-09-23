@@ -14,20 +14,37 @@ export default function AFrameScene() {
 
     import('aframe').then(() => {
       import('aframe-extras').then(() => {
-        if (!window.AFRAME.components['cursor-rotate-xy']) {
-          window.AFRAME.registerComponent('cursor-rotate-xy', {
+        // один общий компонент для мыши и тача
+        if (!window.AFRAME.components['rotate-xy']) {
+          window.AFRAME.registerComponent('rotate-xy', {
             schema: { rotationFactor: { type: 'number', default: 1 } },
+
             init: function () {
               this.rotation = { x: 0, y: 0 };
               this.isDragging = false;
+
+              // биндим методы
               this.onMouseDown = this.onMouseDown.bind(this);
               this.onMouseMove = this.onMouseMove.bind(this);
               this.onMouseUp = this.onMouseUp.bind(this);
+              this.onTouchStart = this.onTouchStart.bind(this);
+              this.onTouchMove = this.onTouchMove.bind(this);
+              this.onTouchEnd = this.onTouchEnd.bind(this);
+
               if (this.el.sceneEl && this.el.sceneEl.canvas) {
-                this.el.sceneEl.canvas.addEventListener('mousedown', this.onMouseDown);
+                const canvas = this.el.sceneEl.canvas;
+                // мышь
+                canvas.addEventListener('mousedown', this.onMouseDown);
+                window.addEventListener('mouseup', this.onMouseUp);
+
+                // тач
+                canvas.addEventListener('touchstart', this.onTouchStart, { passive: false });
+                canvas.addEventListener('touchmove', this.onTouchMove, { passive: false });
+                canvas.addEventListener('touchend', this.onTouchEnd);
               }
-              window.addEventListener('mouseup', this.onMouseUp);
             },
+
+            // мышь
             onMouseDown: function (event) {
               this.isDragging = true;
               this.lastX = event.clientX;
@@ -42,45 +59,14 @@ export default function AFrameScene() {
               const dy = event.clientY - this.lastY;
               this.lastX = event.clientX;
               this.lastY = event.clientY;
-              this.rotation.y += dx * this.data.rotationFactor * 0.5;
-              this.rotation.x += dy * this.data.rotationFactor * 0.5;
-              this.el.setAttribute('rotation', {
-                x: this.rotation.x,
-                y: this.rotation.y,
-                z: 0,
-              });
+              this.updateRotation(dx, dy);
             },
             onMouseUp: function () {
               this.isDragging = false;
               window.removeEventListener('mousemove', this.onMouseMove);
             },
-            remove: function () {
-              window.removeEventListener('mousemove', this.onMouseMove);
-              window.removeEventListener('mouseup', this.onMouseUp);
-              if (this.el.sceneEl && this.el.sceneEl.canvas) {
-                this.el.sceneEl.canvas.removeEventListener('mousedown', this.onMouseDown);
-              }
-            },
-          });
-        }
 
-        if (!window.AFRAME.components['touch-rotate']) {
-          window.AFRAME.registerComponent('touch-rotate', {
-            schema: { rotationFactor: { type: 'number', default: 1 } },
-            init: function () {
-              this.rotation = { x: 0, y: 0 };
-              this.isDragging = false;
-              this.onTouchStart = this.onTouchStart.bind(this);
-              this.onTouchMove = this.onTouchMove.bind(this);
-              this.onTouchEnd = this.onTouchEnd.bind(this);
-
-              if (this.el.sceneEl && this.el.sceneEl.canvas) {
-                const canvas = this.el.sceneEl.canvas;
-                canvas.addEventListener('touchstart', this.onTouchStart, { passive: false });
-                canvas.addEventListener('touchmove', this.onTouchMove, { passive: false });
-                canvas.addEventListener('touchend', this.onTouchEnd);
-              }
-            },
+            // тач
             onTouchStart: function (event) {
               if (event.touches.length === 1) {
                 event.preventDefault();
@@ -98,6 +84,14 @@ export default function AFrameScene() {
               const dy = event.touches[0].clientY - this.lastY;
               this.lastX = event.touches[0].clientX;
               this.lastY = event.touches[0].clientY;
+              this.updateRotation(dx, dy);
+            },
+            onTouchEnd: function () {
+              this.isDragging = false;
+            },
+
+            // общее обновление поворота
+            updateRotation: function (dx, dy) {
               this.rotation.y += dx * this.data.rotationFactor * 0.5;
               this.rotation.x += dy * this.data.rotationFactor * 0.5;
               this.el.setAttribute('rotation', {
@@ -106,12 +100,13 @@ export default function AFrameScene() {
                 z: 0,
               });
             },
-            onTouchEnd: function () {
-              this.isDragging = false;
-            },
+
             remove: function () {
+              window.removeEventListener('mousemove', this.onMouseMove);
+              window.removeEventListener('mouseup', this.onMouseUp);
               if (this.el.sceneEl && this.el.sceneEl.canvas) {
                 const canvas = this.el.sceneEl.canvas;
+                canvas.removeEventListener('mousedown', this.onMouseDown);
                 canvas.removeEventListener('touchstart', this.onTouchStart);
                 canvas.removeEventListener('touchmove', this.onTouchMove);
                 canvas.removeEventListener('touchend', this.onTouchEnd);
@@ -119,6 +114,7 @@ export default function AFrameScene() {
             },
           });
         }
+
         setIsClient(true);
       });
     });
@@ -128,23 +124,26 @@ export default function AFrameScene() {
     };
   }, []);
 
-  const scale = isMobile ? "0.5 0.5 0.5" : "1.5 1.5 1.5";
-  const position = isMobile ? "0 -2.5 0" : "3 -1 2";
-  const cameraPosition = isMobile ? "0 1.5 5" : "0 2.5 9";
-  const cameraRotation = isMobile ? "-10 0 7" : "-20 10 0";
+  const scale = isMobile ? '0.5 0.5 0.5' : '1.5 1.5 1.5';
+  const position = isMobile ? '0 -2.5 0' : '3 -1 2';
+  const cameraPosition = isMobile ? '0 1.5 5' : '0 2.5 9';
+  const cameraRotation = isMobile ? '-10 0 7' : '-20 10 0';
 
   if (!isClient) return null;
 
   return (
     <a-scene style={{ width: '100%', height: '100vh' }}>
-      <a-camera position={cameraPosition} rotation={cameraRotation} look-controls="enabled: false" />
+      <a-camera
+        position={cameraPosition}
+        rotation={cameraRotation}
+        look-controls="enabled: false"
+      />
       <a-entity
         gltf-model="/assets/me2.gltf"
         position={position}
         scale={scale}
         rotation="10 610 10"
-        cursor-rotate-xy
-        touch-rotate
+        rotate-xy
         animation-mixer="clip: *; loop: repeat; speed: 6"
         events={{ 'model-loaded': () => console.log('Model loaded!') }}
       />
