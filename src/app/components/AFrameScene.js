@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useEffect, useState } from "react";
 import Button from "./Button";
@@ -79,64 +79,58 @@ export default function AFrameScene() {
         });
       }
 
-      if (!window.AFRAME.components["rain-cat"]) {
-        window.AFRAME.registerComponent("rain-cat", {
-          schema: {
-            modelSrc: { type: "string", default: "/assets/cat.gltf" },
-            active: { default: false },
-          },
+      if (!window.AFRAME.components["touch-rotate"]) {
+        window.AFRAME.registerComponent("touch-rotate", {
+          schema: { rotationFactor: { type: "number", default: 1 } },
           init: function () {
-            this.rainEntities = [];
-            this.interval = null;
-            this.toggleRain = this.toggleRain.bind(this);
-            this.el.addEventListener("click", this.toggleRain);
-          },
-          toggleRain: function () {
-            this.data.active = !this.data.active;
-            if (this.data.active) {
-              this.startRain();
-            } else {
-              this.stopRain();
+            this.rotation = { x: 0, y: 0 };
+            this.isDragging = false;
+            this.onTouchStart = this.onTouchStart.bind(this);
+            this.onTouchMove = this.onTouchMove.bind(this);
+            this.onTouchEnd = this.onTouchEnd.bind(this);
+
+            if (this.el.sceneEl && this.el.sceneEl.canvas) {
+              const canvas = this.el.sceneEl.canvas;
+              canvas.addEventListener("touchstart", this.onTouchStart, { passive: false });
+              canvas.addEventListener("touchmove", this.onTouchMove, { passive: false });
+              canvas.addEventListener("touchend", this.onTouchEnd);
             }
           },
-          startRain: function () {
-            this.interval = setInterval(() => {
-              if (!this.data.active) return;
-              for (let i = 0; i < 3; i++) {
-                const entity = document.createElement("a-entity");
-                entity.setAttribute("gltf-model", this.data.modelSrc);
-                const scale = (0.3 + Math.random() * 1.2).toFixed(2);
-                const x = (Math.random() * 8 - 4).toFixed(2);
-                const y = 9 + Math.random() * 2;
-                const z = (Math.random() * 6 - 3).toFixed(2);
-                entity.setAttribute("scale", `${scale} ${scale} ${scale}`);
-                entity.setAttribute("position", `${x} ${y} ${z}`);
-                entity.setAttribute("animation", {
-                  property: "position",
-                  from: `${x} ${y} ${z}`,
-                  to: `${x} 0 ${z}`,
-                  dur: 2200 + Math.random() * 1500,
-                  easing: "easeIn",
-                });
-                this.el.sceneEl.appendChild(entity);
-                this.rainEntities.push(entity);
-                setTimeout(() => {
-                  if (entity.parentNode) entity.parentNode.removeChild(entity);
-                }, 3500);
-              }
-            }, 200);
+          onTouchStart: function (event) {
+            if (event.touches.length === 1) {
+              event.preventDefault();
+              this.isDragging = true;
+              this.lastX = event.touches[0].clientX;
+              this.lastY = event.touches[0].clientY;
+              const rot = this.el.getAttribute("rotation");
+              this.rotation = { x: rot.x, y: rot.y };
+            }
           },
-          stopRain: function () {
-            clearInterval(this.interval);
-            this.rainEntities.forEach((entity) => {
-              if (entity.parentNode) entity.parentNode.removeChild(entity);
+          onTouchMove: function (event) {
+            if (!this.isDragging || event.touches.length !== 1) return;
+            event.preventDefault();
+            const dx = event.touches[0].clientX - this.lastX;
+            const dy = event.touches[0].clientY - this.lastY;
+            this.lastX = event.touches[0].clientX;
+            this.lastY = event.touches[0].clientY;
+            this.rotation.y += dx * this.data.rotationFactor * 0.5;
+            this.rotation.x += dy * this.data.rotationFactor * 0.5;
+            this.el.setAttribute("rotation", {
+              x: this.rotation.x,
+              y: this.rotation.y,
+              z: 0,
             });
-            this.rainEntities = [];
+          },
+          onTouchEnd: function () {
+            this.isDragging = false;
           },
           remove: function () {
-            clearInterval(this.interval);
-            this.stopRain();
-            this.el.removeEventListener("click", this.toggleRain);
+            if (this.el.sceneEl && this.el.sceneEl.canvas) {
+              const canvas = this.el.sceneEl.canvas;
+              canvas.removeEventListener("touchstart", this.onTouchStart);
+              canvas.removeEventListener("touchmove", this.onTouchMove);
+              canvas.removeEventListener("touchend", this.onTouchEnd);
+            }
           },
         });
       }
@@ -171,6 +165,7 @@ export default function AFrameScene() {
           scale={roomScale}
           rotation="0 680 0"
           cursor-rotate-xy
+          touch-rotate
         >
           <a-entity
             className="clickable"
@@ -253,14 +248,10 @@ export default function AFrameScene() {
             fontFamily: "Handjet, sans-serif",
           }}
         >
-          {showSecondText && (
-            <TypeWritter
-              text="Этто моя рабочая комната! Её можно покрутить"
-              speed={100}
-            />
-          )}
+          {showSecondText && <TypeWritter text="Этто моя рабочая комната! Её можно покрутить" speed={100} />}
         </h2>
       </div>
     </>
   );
 }
+
