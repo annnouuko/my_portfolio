@@ -19,7 +19,6 @@ export default function AFrameScene3() {
               this.rotation = { x: 0, y: 0 };
               this.isDragging = false;
 
-              // биндим методы
               this.onMouseDown = this.onMouseDown.bind(this);
               this.onMouseMove = this.onMouseMove.bind(this);
               this.onMouseUp = this.onMouseUp.bind(this);
@@ -27,7 +26,6 @@ export default function AFrameScene3() {
               this.onTouchMove = this.onTouchMove.bind(this);
               this.onTouchEnd = this.onTouchEnd.bind(this);
 
-              // ждём пока появится canvas
               if (this.el.sceneEl) {
                 this.el.sceneEl.addEventListener('render-target-loaded', () => {
                   const canvas = this.el.sceneEl.canvas;
