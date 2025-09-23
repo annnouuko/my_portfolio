@@ -1,48 +1,33 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 
-export default function AFrameScene3() {
+export default function AFrameScene() {
   const [isClient, setIsClient] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const modelRef = useRef(null);
-  const pauseDuration = 3000;
 
   useEffect(() => {
+    const checkMobile = () => window.innerWidth <= 768;
+    setIsMobile(checkMobile());
+    const handleResize = () => setIsMobile(checkMobile());
+    window.addEventListener('resize', handleResize);
+
     import('aframe').then(() => {
       import('aframe-extras').then(() => {
         if (!window.AFRAME.components['cursor-rotate-xy']) {
           window.AFRAME.registerComponent('cursor-rotate-xy', {
             schema: { rotationFactor: { type: 'number', default: 1 } },
-
             init: function () {
               this.rotation = { x: 0, y: 0 };
               this.isDragging = false;
-
               this.onMouseDown = this.onMouseDown.bind(this);
               this.onMouseMove = this.onMouseMove.bind(this);
               this.onMouseUp = this.onMouseUp.bind(this);
-              this.onTouchStart = this.onTouchStart.bind(this);
-              this.onTouchMove = this.onTouchMove.bind(this);
-              this.onTouchEnd = this.onTouchEnd.bind(this);
-
-              if (this.el.sceneEl) {
-                this.el.sceneEl.addEventListener('render-target-loaded', () => {
-                  const canvas = this.el.sceneEl.canvas;
-                  if (!canvas) return;
-
-                  // мышь
-                  canvas.addEventListener('mousedown', this.onMouseDown);
-                  window.addEventListener('mouseup', this.onMouseUp);
-
-                  // тач
-                  canvas.addEventListener('touchstart', this.onTouchStart, { passive: false });
-                  canvas.addEventListener('touchmove', this.onTouchMove, { passive: false });
-                  canvas.addEventListener('touchend', this.onTouchEnd);
-                });
+              if (this.el.sceneEl && this.el.sceneEl.canvas) {
+                this.el.sceneEl.canvas.addEventListener('mousedown', this.onMouseDown);
               }
+              window.addEventListener('mouseup', this.onMouseUp);
             },
-
             onMouseDown: function (event) {
               this.isDragging = true;
               this.lastX = event.clientX;
@@ -51,7 +36,6 @@ export default function AFrameScene3() {
               this.rotation = { x: rot.x, y: rot.y };
               window.addEventListener('mousemove', this.onMouseMove);
             },
-
             onMouseMove: function (event) {
               if (!this.isDragging) return;
               const dx = event.clientX - this.lastX;
@@ -66,12 +50,37 @@ export default function AFrameScene3() {
                 z: 0,
               });
             },
-
             onMouseUp: function () {
               this.isDragging = false;
               window.removeEventListener('mousemove', this.onMouseMove);
             },
+            remove: function () {
+              window.removeEventListener('mousemove', this.onMouseMove);
+              window.removeEventListener('mouseup', this.onMouseUp);
+              if (this.el.sceneEl && this.el.sceneEl.canvas) {
+                this.el.sceneEl.canvas.removeEventListener('mousedown', this.onMouseDown);
+              }
+            },
+          });
+        }
 
+        if (!window.AFRAME.components['touch-rotate']) {
+          window.AFRAME.registerComponent('touch-rotate', {
+            schema: { rotationFactor: { type: 'number', default: 1 } },
+            init: function () {
+              this.rotation = { x: 0, y: 0 };
+              this.isDragging = false;
+              this.onTouchStart = this.onTouchStart.bind(this);
+              this.onTouchMove = this.onTouchMove.bind(this);
+              this.onTouchEnd = this.onTouchEnd.bind(this);
+
+              if (this.el.sceneEl && this.el.sceneEl.canvas) {
+                const canvas = this.el.sceneEl.canvas;
+                canvas.addEventListener('touchstart', this.onTouchStart, { passive: false });
+                canvas.addEventListener('touchmove', this.onTouchMove, { passive: false });
+                canvas.addEventListener('touchend', this.onTouchEnd);
+              }
+            },
             onTouchStart: function (event) {
               if (event.touches.length === 1) {
                 event.preventDefault();
@@ -82,7 +91,6 @@ export default function AFrameScene3() {
                 this.rotation = { x: rot.x, y: rot.y };
               }
             },
-
             onTouchMove: function (event) {
               if (!this.isDragging || event.touches.length !== 1) return;
               event.preventDefault();
@@ -98,17 +106,12 @@ export default function AFrameScene3() {
                 z: 0,
               });
             },
-
             onTouchEnd: function () {
               this.isDragging = false;
             },
-
             remove: function () {
-              window.removeEventListener('mousemove', this.onMouseMove);
-              window.removeEventListener('mouseup', this.onMouseUp);
               if (this.el.sceneEl && this.el.sceneEl.canvas) {
                 const canvas = this.el.sceneEl.canvas;
-                canvas.removeEventListener('mousedown', this.onMouseDown);
                 canvas.removeEventListener('touchstart', this.onTouchStart);
                 canvas.removeEventListener('touchmove', this.onTouchMove);
                 canvas.removeEventListener('touchend', this.onTouchEnd);
@@ -119,66 +122,30 @@ export default function AFrameScene3() {
         setIsClient(true);
       });
     });
-  }, []);
-
-  useEffect(() => {
-    const checkIsMobile = () => setIsMobile(window.innerWidth <= 768);
-    checkIsMobile();
-    window.addEventListener('resize', checkIsMobile);
-    return () => window.removeEventListener('resize', checkIsMobile);
-  }, []);
-
-  useEffect(() => {
-    if (!isClient) return;
-    const el = modelRef.current;
-    if (!el) return;
-
-    let timeoutId;
-
-    function onAnimationFinished() {
-      el.components['animation-mixer'].timeScale = 0;
-      timeoutId = setTimeout(() => {
-        el.components['animation-mixer'].timeScale = 1;
-        const mixer = el.components['animation-mixer'].mixer;
-        if (mixer) {
-          mixer.setTime(0);
-          mixer.clipAction(mixer._actions[0]._clip).play();
-        }
-      }, pauseDuration);
-    }
-
-    function onModelLoaded() {
-      el.components['animation-mixer'].timeScale = 1;
-    }
-
-    el.addEventListener('animation-finished', onAnimationFinished);
-    el.addEventListener('model-loaded', onModelLoaded);
 
     return () => {
-      el.removeEventListener('animation-finished', onAnimationFinished);
-      el.removeEventListener('model-loaded', onModelLoaded);
-      clearTimeout(timeoutId);
+      window.removeEventListener('resize', handleResize);
     };
-  }, [isClient]);
+  }, []);
+
+  const scale = isMobile ? "0.5 0.5 0.5" : "1.5 1.5 1.5";
+  const position = isMobile ? "0 -2.5 0" : "3 -1 2";
+  const cameraPosition = isMobile ? "0 1.5 5" : "0 2.5 9";
+  const cameraRotation = isMobile ? "-10 0 7" : "-20 10 0";
 
   if (!isClient) return null;
-
-  const scale = isMobile ? '0.5 0.5 0.5' : '1.5 1.5 1.5';
-  const position = isMobile ? '0 -2 0' : '3 -1 2';
-  const cameraPosition = isMobile ? '0 1.5 5' : '0 2.5 9';
-  const cameraRotation = isMobile ? '-10 0 7' : '-20 10 0';
 
   return (
     <a-scene style={{ width: '100%', height: '100vh' }}>
       <a-camera position={cameraPosition} rotation={cameraRotation} look-controls="enabled: false" />
       <a-entity
-        ref={modelRef}
         gltf-model="/assets/me2.gltf"
         position={position}
         scale={scale}
         rotation="10 610 10"
         cursor-rotate-xy
-        animation-mixer="clip: *; loop: once; timeScale: 1"
+        touch-rotate
+        animation-mixer="clip: *; loop: repeat; speed: 6"
         events={{ 'model-loaded': () => console.log('Model loaded!') }}
       />
     </a-scene>
