@@ -287,6 +287,9 @@
       max-width: 96rem;
     }
   }
+  .m-1 {
+    margin: calc(var(--spacing) * 1);
+  }
   .m-4 {
     margin: calc(var(--spacing) * 4);
   }
@@ -295,6 +298,9 @@
   }
   .mx-auto {
     margin-inline: auto;
+  }
+  .mt-1 {
+    margin-top: calc(var(--spacing) * 1);
   }
   .mt-2 {
     margin-top: calc(var(--spacing) * 2);
@@ -567,23 +573,11 @@
   .text-\[24px\] {
     font-size: 24px;
   }
-  .text-\[clamp\(10px\,2vw\,24px\)\] {
-    font-size: clamp(10px, 2vw, 24px);
-  }
-  .text-\[clamp\(19px\,2vw\,24px\)\] {
-    font-size: clamp(19px, 2vw, 24px);
-  }
   .text-\[clamp\(20px\,8vw\,24px\)\] {
     font-size: clamp(20px, 8vw, 24px);
   }
   .text-\[clamp\(23px\,2vw\,24px\)\] {
     font-size: clamp(23px, 2vw, 24px);
-  }
-  .text-\[clamp\(28px\,2vw\,10px\)\] {
-    font-size: clamp(28px, 2vw, 10px);
-  }
-  .text-\[clamp\(28px\,2vw\,24px\)\] {
-    font-size: clamp(28px, 2vw, 24px);
   }
   .leading-relaxed {
     --tw-leading: var(--leading-relaxed);
@@ -718,6 +712,11 @@
     @media (width >= 48rem) {
       --tw-shadow: 0 0 #0000;
       box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+    }
+  }
+  .lg\:m-4 {
+    @media (width >= 64rem) {
+      margin: calc(var(--spacing) * 4);
     }
   }
   .lg\:m-10 {
