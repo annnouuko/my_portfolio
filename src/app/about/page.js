@@ -10,7 +10,7 @@ export default function About() {
             <div className="flex flex-col lg:flex-row justify-start w-full max-w-full lg:w-[1480px] h-auto lg:h-[820px] m-4 lg:m-10 gap-6 lg:gap-[4rem]">
                 <div className="flex justify-center items-center w-full lg:w-[700px]">
                     <div className="flex justify-start h-auto lg:h-[650px] w-full lg:w-[700px] px-4 lg:px-0  ">
-                        <div className="flex flex-col text-[24px] h-auto lg:h-[710px] justify-between text-[clamp(28px,2vw,24px)] w-full ">
+                        <div className="flex flex-col text-[24px] h-auto lg:h-[710px] justify-between text-[clamp(23px,2vw,24px)] w-full ">
                             <div className="w-full">
                                 Окончила институт бизнеса и дизайна в 2024 году по программе цифровой дизайн и веб-проектирование.
                                 Создаю интерфейсы, иллюстрации, анимацию и 3D — от концепта до реализации.

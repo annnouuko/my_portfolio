@@ -1,17 +1,4 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
   "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/avtoport/page": "app/avtoport/page.js",
-  "/about/page": "app/about/page.js",
-  "/3Dsculpt/page": "app/3Dsculpt/page.js",
-  "/andy_yorholl/page": "app/andy_yorholl/page.js",
-  "/contacts/page": "app/contacts/page.js",
-  "/design_zavod/page": "app/design_zavod/page.js",
-  "/flower/page": "app/flower/page.js",
-  "/marmel/page": "app/marmel/page.js",
-  "/me_3d_pers/page": "app/me_3d_pers/page.js",
-  "/page": "app/page.js",
-  "/work1/page": "app/work1/page.js",
-  "/tach/page": "app/tach/page.js",
-  "/works/page": "app/works/page.js"
+  "/about/page": "app/about/page.js"
 }
