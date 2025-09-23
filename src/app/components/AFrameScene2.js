@@ -128,7 +128,7 @@ export default function AFrameScene() {
     };
   }, []);
 
-  const scale = isMobile ? "0.6 0.6 0.6" : "1.5 1.5 1.5";
+  const scale = isMobile ? "0.5 0.5 0.5" : "1.5 1.5 1.5";
   const position = isMobile ? "0 -2.5 0" : "3 -1 2";
   const cameraPosition = isMobile ? "0 1.5 5" : "0 2.5 9";
   const cameraRotation = isMobile ? "-10 0 7" : "-20 10 0";

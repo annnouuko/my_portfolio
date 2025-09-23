@@ -27,7 +27,7 @@ export default function Works_grids() {
   }
 
   return (
-    <div className="flex flex-col justify-start w-full max-w-[1465px] m-10 lg:m-10 gap-12 !ml-10"
+    <div className="flex flex-col justify-start w-full max-w-[1465px] m-2 lg:m-10 gap-12 "
 >
       {rows.map((row, rowIndex) => (
         <div key={rowIndex} className="flex flex-row flex-wrap justify-center gap-8 w-full">
