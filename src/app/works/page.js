@@ -8,7 +8,7 @@ export default function Works(){
     return(
         <main>
             <Header></Header>
-            <Rubricator></Rubricator>
+            
             <Works_grids></Works_grids>
         </main>
     )
