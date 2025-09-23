@@ -28,9 +28,10 @@ export default function About() {
                 </div>
 
                 {/* Сцена A-Frame */}
-                <div className="flex justify-center w-full lg:w-1/2 h-[400px] lg:h-[700px]">
+                <div className="flex justify-center w-full lg:w-1/2 max-h-[400px] lg:h-[700px] overflow-auto">
                     <AframeScene2 />
                 </div>
+
             </div>
         </main>
     );
