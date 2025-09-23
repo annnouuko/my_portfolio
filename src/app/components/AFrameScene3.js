@@ -19,24 +19,30 @@ export default function AFrameScene3() {
               this.rotation = { x: 0, y: 0 };
               this.isDragging = false;
 
-              // Мышь
+              // биндим методы
               this.onMouseDown = this.onMouseDown.bind(this);
               this.onMouseMove = this.onMouseMove.bind(this);
               this.onMouseUp = this.onMouseUp.bind(this);
-
-              // Сенсорные события
               this.onTouchStart = this.onTouchStart.bind(this);
               this.onTouchMove = this.onTouchMove.bind(this);
               this.onTouchEnd = this.onTouchEnd.bind(this);
 
-              if (this.el.sceneEl && this.el.sceneEl.canvas) {
-                const canvas = this.el.sceneEl.canvas;
-                canvas.addEventListener('mousedown', this.onMouseDown);
-                canvas.addEventListener('touchstart', this.onTouchStart, { passive: false });
-                canvas.addEventListener('touchmove', this.onTouchMove, { passive: false });
-                canvas.addEventListener('touchend', this.onTouchEnd);
+              // ждём пока появится canvas
+              if (this.el.sceneEl) {
+                this.el.sceneEl.addEventListener('render-target-loaded', () => {
+                  const canvas = this.el.sceneEl.canvas;
+                  if (!canvas) return;
+
+                  // мышь
+                  canvas.addEventListener('mousedown', this.onMouseDown);
+                  window.addEventListener('mouseup', this.onMouseUp);
+
+                  // тач
+                  canvas.addEventListener('touchstart', this.onTouchStart, { passive: false });
+                  canvas.addEventListener('touchmove', this.onTouchMove, { passive: false });
+                  canvas.addEventListener('touchend', this.onTouchEnd);
+                });
               }
-              window.addEventListener('mouseup', this.onMouseUp);
             },
 
             onMouseDown: function (event) {
@@ -160,7 +166,7 @@ export default function AFrameScene3() {
   if (!isClient) return null;
 
   const scale = isMobile ? '0.5 0.5 0.5' : '1.5 1.5 1.5';
-  const position = isMobile ? '0 -0.5 0' : '3 -1 2';
+  const position = isMobile ? '0 -2 0' : '3 -1 2';
   const cameraPosition = isMobile ? '0 1.5 5' : '0 2.5 9';
   const cameraRotation = isMobile ? '-10 0 7' : '-20 10 0';
 

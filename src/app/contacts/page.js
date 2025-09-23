@@ -10,7 +10,7 @@ export default function Contacts() {
     return (
         <main className="pt-2 md:pt-16 lg:pt-2 overflow-x-hidden">
             <Header></Header>
-            <div className="flex flex-row justify-start w-[1480px] h-[820px] m-2 lg:m-10  gap-[4rem]  ">
+            <div className="flex flex-row justify-start w-[1480px] h-[820px] m-4 lg:m-10  gap-[4rem]  ">
                 <div className="flex  justify-center items-center  flex-row  w-[700px]  ">
                     <div className="flex justify-start h-[650px] w-[700px]">
                         <div className="flex flex-col text-[24px] h-[710px] justify-between text-[clamp(23px,8vw,24px)]">
