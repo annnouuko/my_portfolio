@@ -1,12 +1,14 @@
-"use client";
+'use client';
 
 import React, { useEffect, useState, useRef } from "react";
 
 export default function AFrameScene() {
   const [isClient, setIsClient] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const modelRef = useRef(null);
-  const pauseDuration = 3000; // пауза 3 секунды
+  const pauseDuration = 3000;
 
+  // Загрузка aframe и регистрация компонента
   useEffect(() => {
     import("aframe").then(() => {
       import("aframe-extras").then(() => {
@@ -64,6 +66,19 @@ export default function AFrameScene() {
     });
   }, []);
 
+  // Адаптация к мобильному устройству
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkIsMobile();
+
+    window.addEventListener("resize", checkIsMobile);
+    return () => window.removeEventListener("resize", checkIsMobile);
+  }, []);
+
+  // Управление анимацией модели
   useEffect(() => {
     if (!isClient) return;
     const el = modelRef.current;
@@ -72,13 +87,9 @@ export default function AFrameScene() {
     let timeoutId;
 
     function onAnimationFinished() {
-      // Останавливаем анимацию, установив скорость 0 (заморозка на последнем кадре)
       el.components["animation-mixer"].timeScale = 0;
-
-      // Через паузу запускаем анимацию заново с нормальной скоростью
       timeoutId = setTimeout(() => {
         el.components["animation-mixer"].timeScale = 1;
-        // Запускаем анимацию с начала
         const mixer = el.components["animation-mixer"].mixer;
         if (mixer) {
           mixer.setTime(0);
@@ -87,12 +98,11 @@ export default function AFrameScene() {
       }, pauseDuration);
     }
 
-    el.addEventListener("animation-finished", onAnimationFinished);
-
-    // Запускаем анимацию сразу после загрузки модели
     function onModelLoaded() {
       el.components["animation-mixer"].timeScale = 1;
     }
+
+    el.addEventListener("animation-finished", onAnimationFinished);
     el.addEventListener("model-loaded", onModelLoaded);
 
     return () => {
@@ -104,15 +114,20 @@ export default function AFrameScene() {
 
   if (!isClient) return null;
 
+  // Использование адаптивных параметров
+  const scale = isMobile ? "0.5 0.5 0.5" : "1.5 1.5 1.5";
+  const position = isMobile ? "0 -2.5 0" : "3 -1 2";
+  const cameraPosition = isMobile ? "0 1.5 5" : "0 2.5 9";
+  const cameraRotation = isMobile ? "-10 0 7" : "-20 10 0";
+
   return (
     <a-scene style={{ width: "100%", height: "100vh" }}>
-      <a-camera position="0 2.5 9" rotation="-20 10 0" look-controls="enabled: false" />
-
+      <a-camera position={cameraPosition} rotation={cameraRotation} look-controls="enabled: false" />
       <a-entity
         ref={modelRef}
         gltf-model="/assets/me2.gltf"
-        position="2.5 -1 2"
-        scale="1.5 1.5 1.5"
+        position={position}
+        scale={scale}
         rotation="10 610 10"
         cursor-rotate-xy
         animation-mixer="clip: *; loop: once; timeScale: 1"

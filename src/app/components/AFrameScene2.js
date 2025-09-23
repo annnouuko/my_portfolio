@@ -85,10 +85,10 @@ export default function AFrameScene() {
   if (!isClient) return null;
 
   // Настройки масштаба для разных устройств
-  const scale = isMobile ? "0.8 0.8 0.8" : "1.5 1.5 1.5";
-  const position = isMobile ? "0 -0.5 0" : "3 -1 2";
+  const scale = isMobile ? "0.5 0.5 0.5" : "1.5 1.5 1.5";
+  const position = isMobile ? "0 -2.5 0" : "3 -1 2";
   const cameraPosition = isMobile ? "0 1.5 5" : "0 2.5 9";
-  const cameraRotation = isMobile ? "-10 0 0" : "-20 10 0";
+  const cameraRotation = isMobile ? "-10 0 7" : "-20 10 0";
 
   return (
     <>

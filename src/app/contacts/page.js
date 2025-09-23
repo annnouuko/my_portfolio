@@ -7,12 +7,12 @@ import Header from "../components/header";
 
 export default function About() {
     return (
-        <main>
+        <main className=" md:pt-16 lg:pt-2 overflow-x-hidden">
             <Header></Header>
             <div className="flex flex-row justify-start w-[1480px] h-[820px] m-10  gap-[4rem]  ">
                 <div className="flex  justify-center items-center  flex-row  w-[700px]  ">
                     <div className="flex justify-start h-[650px] w-[700px]">
-                        <div className="flex flex-col text-[24px] h-[710px] justify-between text-[clamp(28px,8vw,24px)]">
+                        <div className="flex flex-col text-[24px] h-[710px] justify-between text-[clamp(20px,8vw,24px)]">
                             <div>
 
                                 <div>Контакты:</div>
